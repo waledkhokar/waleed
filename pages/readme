@@ -1,0 +1,398 @@
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+import Head from 'next/head';
+import Image from 'next/image';
+
+// Course data array
+const courses = [
+  { code: "MTS-111", name: "Calculus & Analytical Geometry", semester: "Spring 2022", year: 1, status: "Pass", credit: "3" },
+  { code: "CS-111", name: "Introduction to Computers", semester: "Spring 2022", year: 1, status: "Pass", credit: "3" },
+  { code: "HUM-114", name: "Islamic Studies/Ethics", semester: "Spring 2022", year: 1, status: "Pass", credit: "3" },
+  { code: "CS-113", name: "Programming Fundamentals", semester: "Spring 2022", year: 1, status: "Pass", credit: "3" },
+  { code: "ELL101", name: "Reading & Writing Skill", semester: "Spring 2022", year: 1, status: "Pass", credit: "3" },
+  { code: "CS-116", name: "Basic Electronics", semester: "Fall 2022", year: 2, status: "Pass", credit: "3" },
+  { code: "ELL 104", name: "Composition Writing", semester: "Fall 2022", year: 2, status: "Pass", credit: "3" },
+  { code: "CS-114", name: "Discrete Structures", semester: "Fall 2022", year: 2, status: "Pass", credit: "3" },
+  { code: "CS-112", name: "Object Oriented Programming", semester: "Fall 2022", year: 2, status: "Pass", credit: "3" },
+  { code: "HUM-120", name: "Pakistan Studies", semester: "Fall 2022", year: 2, status: "Pass", credit: "3" },
+  { code: "MTS-112", name: "Probability and Statistics", semester: "Fall 2022", year: 2, status: "Pass", credit: "3" },
+  { code: "CS-213", name: "Data Communication and Computer Networks", semester: "Spring 2023", year: 3, status: "Pass", credit: "3" },
+  { code: "CS-211", name: "Data Structure & Algorithms", semester: "Spring 2023", year: 3, status: "Pass", credit: "3" },
+  { code: "CS-215", name: "Digital Logic & Design", semester: "Spring 2023", year: 3, status: "Pass", credit: "3" },
+  { code: "SE-211", name: "Software Engineering", semester: "Spring 2023", year: 3, status: "Pass", credit: "3" },
+  { code: "EDU-0201", name: "Urdu Language", semester: "Spring 2023", year: 3, status: "Pass", credit: "3" },
+  { code: "EDU-0202", name: "Applied Physics", semester: "Spring 2023", year: 3, status: "Pass", credit: "3" },
+  { code: "CS-226", name: "Computer Architecture & Organization", semester: "Fall 2023", year: 4, status: "Pass", credit: "3" },
+  { code: "MTS-222", name: "Linear Algebra", semester: "Fall 2023", year: 4, status: "Pass", credit: "3" },
+  { code: "MTS-224", name: "Multivariable Calculus", semester: "Fall 2023", year: 4, status: "Pass", credit: "3" },
+  { code: "CS-222", name: "Operating System", semester: "Fall 2023", year: 4, status: "Pass", credit: "3" },
+  { code: "MGT-290", name: "Psychology", semester: "Fall 2023", year: 4, status: "Pass", credit: "3" },
+  { code: "CS-311", name: "Theory of Automata", semester: "Fall 2023", year: 4, status: "Pass", credit: "3" },
+  { code: "MTS-311", name: "Differential Equations", semester: "Spring 2024", year: 5, status: "Pass", credit: "3" },
+  { code: "CS-214", name: "Database System", semester: "Spring 2024", year: 5, status: "Pass", credit: "3" },
+  { code: "CS-0485", name: "IT Project Management", semester: "Spring 2024", year: 5, status: "Pass", credit: "3" },
+  { code: "CS-313", name: "Web Design and Development", semester: "Spring 2024", year: 5, status: "Pass", credit: "3" },
+  { code: "CS-315", name: "Microprocessor & Assembly Language", semester: "Spring 2024", year: 5, status: "Pass", credit: "3" },
+  { code: "MGT-211", name: "Principles of Management", semester: "Spring 2024", year: 5, status: "Pass", credit: "3" },
+  { code: "CS-424", name: "Artificial Intelligence", semester: "Fall 2024", year: 6, status: "Pass", credit: "3" },
+  { code: "CS-326", name: "Compiler Construction", semester: "Fall 2024", year: 6, status: "Pass", credit: "3" },
+  { code: "CS-413", name: "Design and Analysis of Algorithms", semester: "Fall 2024", year: 6, status: "Pass", credit: "3" },
+  { code: "CS-417", name: "Information Security", semester: "Fall 2024", year: 6, status: "Pass", credit: "3" },
+  { code: "CS-485", name: "Introduction to Neural Networks", semester: "Fall 2024", year: 6, status: "Pass", credit: "3" },
+  { code: "CS-317", name: "Visual Programming", semester: "Fall 2024", year: 6, status: "Pass", credit: "3" },
+  { code: "CS-452", name: "Data Encryption and Security", semester: "Spring 2025", year: 7, status: "Pass", credit: "3" },
+  { code: "CS-332", name: "Human Computer Interaction", semester: "Spring 2025", year: 7, status: "Pass", credit: "3" },
+  { code: "CS-415", name: "Numerical Computing", semester: "Spring 2025", year: 7, status: "Pass", credit: "3" },
+  { code: "CS-422", name: "Professional Practices", semester: "Spring 2025", year: 7, status: "Pass", credit: "3" },
+  { code: "CS-473", name: "Machine Learning Techniques", semester: "Spring 2025", year: 7, status: "Pass", credit: "3" },
+  { code: "ISL-601", name: "Quran o Hadith", semester: "Spring 2025", year: 7, status: "Pass", credit: "3" },
+  { code: "CS-463", name: "Data Mining", semester: "Fall 2025", year: 8, status: "Enrolled", credit: "3", attendance: "2/3" },
+  { code: "CS-499", name: "Project", semester: "Fall 2025", year: 8, status: "Enrolled", credit: "3" },
+  { code: "ISL-512", name: "Seerat and Tasawwuf", semester: "Fall 2025", year: 8, status: "Enrolled", credit: "3", attendance: "2/3" }
+];
+
+export default function Dashboard() {
+  const router = useRouter();
+  const [student, setStudent] = useState(null);
+
+  useEffect(() => {
+    const loggedIn = localStorage.getItem('loggedIn');
+    const studentData = JSON.parse(localStorage.getItem('student'));
+
+    if (!loggedIn || !studentData) {
+      router.push('/');
+    } else {
+      setStudent({
+        ...studentData,
+        batch: "2022-2026",
+        department: "Computer Science",
+        cgpa: "3.4",
+        picture: "/student.jpg",
+        currentSemester: "Fall 2025",
+        currentYear: "8th Semester",
+        advisor: "Dr. Muhammad Ali",
+        bloodGroup: "B+",
+        address: "Hostel Block C, Room 214",
+        name: studentData.name || "Waleed Hussain",
+        regNo: studentData.regNo || "22-APH-27426",
+        program: studentData.program || "BS Computer Science",
+        email: studentData.email || "waleed@example.com"
+      });
+    }
+  }, [router]);
+
+  if (!student) return (
+    <div className="flex justify-center items-center min-h-screen">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+    </div>
+  );
+
+  // Filter current semester enrolled courses
+  const currentCourses = courses.filter(course => 
+    course.status === "Enrolled" && course.semester === student.currentSemester
+  );
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Head>
+        <title>Student Dashboard | MIU LMS</title>
+      </Head>
+
+      {/* Header */}
+      <header className="bg-gradient-to-r from-blue-800 to-blue-600 text-white shadow-lg">
+        <div className="container mx-auto px-4 py-3 flex justify-between items-center">
+          <div className="flex items-center space-x-3">
+            <Image 
+              src="/logo.jpg" 
+              alt="University Logo" 
+              width={40} 
+              height={40}
+              className="rounded"
+            />
+            <h1 className="text-xl font-bold">MIU Learning Management System</h1>
+          </div>
+          <div className="flex items-center space-x-4">
+            <div className="relative">
+              <Image
+                src={student.picture}
+                alt="Student"
+                width={40}
+                height={40}
+                className="rounded-full border-2 border-white"
+              />
+              <span className="absolute -bottom-1 -right-1 bg-green-500 rounded-full w-3 h-3"></span>
+            </div>
+            <div>
+              <p className="font-medium">{student.name}</p>
+              <p className="text-xs text-blue-100">{student.regNo}</p>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <div className="container mx-auto px-4 py-6 flex flex-col lg:flex-row gap-6">
+        {/* Sidebar */}
+        <aside className="w-full lg:w-64 bg-white rounded-xl shadow-md p-4 h-fit sticky top-6">
+          <nav>
+            <ul className="space-y-1">
+              <li>
+                <a href="#" className="flex items-center space-x-3 p-3 bg-blue-100 text-blue-800 rounded-lg font-medium">
+                  <span>📊</span>
+                  <span>Dashboard</span>
+                </a>
+              </li>
+              <li>
+                <a href="#" className="flex items-center space-x-3 p-3 hover:bg-gray-100 rounded-lg">
+                  <span>📝</span>
+                  <span>Academics</span>
+                </a>
+              </li>
+              <li>
+                <a href="#" className="flex items-center space-x-3 p-3 hover:bg-gray-100 rounded-lg">
+                  <span>📚</span>
+                  <span>Courses</span>
+                </a>
+              </li>
+              <li>
+                <a href="#" className="flex items-center space-x-3 p-3 hover:bg-gray-100 rounded-lg">
+                  <span>📊</span>
+                  <span>Grades</span>
+                </a>
+              </li>
+              <li>
+                <a href="#" className="flex items-center space-x-3 p-3 hover:bg-gray-100 rounded-lg">
+                  <span>✅</span>
+                  <span>Attendance</span>
+                </a>
+              </li>
+              <li>
+                <button 
+                  onClick={() => {
+                    localStorage.removeItem('loggedIn');
+                    localStorage.removeItem('student');
+                    router.push('/');
+                  }}
+                  className="w-full text-left flex items-center space-x-3 p-3 hover:bg-gray-100 rounded-lg text-red-600"
+                >
+                  <span>🚪</span>
+                  <span>Logout</span>
+                </button>
+              </li>
+            </ul>
+          </nav>
+        </aside>
+
+        {/* Dashboard Content */}
+        <main className="flex-1">
+          {/* Profile Card */}
+          <div className="bg-white rounded-xl shadow-md overflow-hidden mb-6">
+            <div className="bg-gradient-to-r from-blue-700 to-blue-600 p-4 text-white">
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-semibold">Student Profile</h2>
+                <span className="text-sm bg-blue-800 px-3 py-1 rounded-full">Active</span>
+              </div>
+            </div>
+            
+            <div className="p-6">
+              <div className="flex flex-col md:flex-row gap-6">
+                {/* Student Picture */}
+                <div className="w-full md:w-1/4 flex flex-col items-center">
+                  <div className="relative mb-4">
+                    <Image
+                      src={student.picture}
+                      alt="Student"
+                      width={150}
+                      height={150}
+                      className="rounded-lg border-4 border-blue-100"
+                    />
+                    <div className="absolute -bottom-2 -right-2 bg-blue-600 text-white rounded-full px-3 py-1 text-xs font-bold">
+                      Verified
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <h3 className="font-bold text-lg">{student.name}</h3>
+                    <p className="text-blue-600">{student.regNo}</p>
+                    <p className="text-sm text-gray-500 mt-1">{student.program}</p>
+                  </div>
+                </div>
+                
+                {/* Student Details */}
+                <div className="w-full md:w-3/4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                      <p className="text-sm text-gray-500 font-medium">Personal Information</p>
+                      <div className="mt-2 space-y-2">
+                        <p><span className="font-medium">Father Name:</span> Muhammad Hussain</p>
+                        <p><span className="font-medium">CNIC:</span> 42201-1234567-8</p>
+                        <p><span className="font-medium">Blood Group:</span> {student.bloodGroup}</p>
+                        <p><span className="font-medium">Address:</span> {student.address}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                      <p className="text-sm text-gray-500 font-medium">Academic Information</p>
+                      <div className="mt-2 space-y-2">
+                        <p><span className="font-medium">Batch:</span> {student.batch}</p>
+                        <p><span className="font-medium">Department:</span> {student.department}</p>
+                        <p><span className="font-medium">Current Semester:</span> {student.currentSemester}</p>
+                        <p><span className="font-medium">Academic Advisor:</span> {student.advisor}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                      <p className="text-sm text-gray-500 font-medium">Contact Information</p>
+                      <div className="mt-2 space-y-2">
+                        <p><span className="font-medium">Email:</span> {student.email}</p>
+                        <p><span className="font-medium">Phone:</span> +92 300 1234567</p>
+                        <p><span className="font-medium">Emergency Contact:</span> +92 300 7654321</p>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                      <p className="text-sm text-gray-500 font-medium">Academic Progress</p>
+                      <div className="mt-2 space-y-2">
+                        <p><span className="font-medium">CGPA:</span> {student.cgpa}</p>
+                        <p><span className="font-medium">Credits Completed:</span> 102/136</p>
+                        <p><span className="font-medium">Current Status:</span> Regular</p>
+                        <p><span className="font-medium">Scholarship:</span> Merit-based (50%)</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        {/* Academic Summary */}
+<div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+  {/* CGPA Card */}
+  <div className="bg-white rounded-xl shadow-md p-6 text-center border border-blue-100">
+    <div className="text-blue-600 text-4xl font-bold mb-2">{student.cgpa}</div>
+    <h3 className="font-semibold text-gray-700">Current CGPA</h3>
+    <p className="text-sm text-gray-500">Out of 4.0 Scale</p>
+  </div>
+
+  {/* Credits Completed Card */}
+  <div className="bg-white rounded-xl shadow-md p-6 text-center border border-blue-100">
+    <div className="text-green-600 text-4xl font-bold mb-2">102</div>
+    <h3 className="font-semibold text-gray-700">Credits Completed</h3>
+    <p className="text-sm text-gray-500">Total Credits Earned</p>
+  </div>
+
+  {/* Current Semester Card */}
+  <div className="bg-white rounded-xl shadow-md p-6 text-center border border-blue-100">
+    <div className="text-purple-600 text-3xl font-bold mb-2">{student.currentSemester}</div>
+    <h3 className="font-semibold text-gray-700">Current Semester</h3>
+    <p className="text-sm text-gray-500">{student.currentYear}</p>
+  </div>
+</div>
+
+          {/* Courses Table */}
+          <section className="bg-white rounded-xl shadow-md p-6">
+            <h2 className="text-xl font-semibold mb-4 text-gray-800">Courses & Results</h2>
+            
+            <div className="overflow-x-auto">
+              <table className="min-w-full border border-gray-200">
+                <thead className="bg-blue-100 text-blue-900">
+                  <tr>
+                    <th className="px-4 py-2 border border-blue-200">Code</th>
+                    <th className="px-4 py-2 border border-blue-200">Course Name</th>
+                    <th className="px-4 py-2 border border-blue-200">Semester</th>
+                    <th className="px-4 py-2 border border-blue-200">Year</th>
+                    <th className="px-4 py-2 border border-blue-200">Status</th>
+                    <th className="px-4 py-2 border border-blue-200">Credit Hours</th>
+                    <th className="px-4 py-2 border border-blue-200">Attendance</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {courses.map(({ code, name, semester, year, status, credit, attendance }, i) => (
+                    <tr key={i} className="text-center hover:bg-gray-50">
+                      <td className="px-4 py-2 border border-gray-200">{code}</td>
+                      <td className="px-4 py-2 border border-gray-200 text-left">{name}</td>
+                      <td className="px-4 py-2 border border-gray-200">{semester}</td>
+                      <td className="px-4 py-2 border border-gray-200">{year}</td>
+                      <td className={`px-4 py-2 border border-gray-200 font-semibold ${
+                        status === "Pass" ? "text-green-600" :
+                        status === "Enrolled" ? "text-purple-600" :
+                        "text-red-600"
+                      }`}>
+                        {status}
+                      </td>
+                      <td className="px-4 py-2 border border-gray-200">{credit}</td>
+                      <td className="px-4 py-2 border border-gray-200">{attendance || "-"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </main>
+      </div>
+
+      {/* Footer */}
+      <footer className="bg-blue-800 text-white text-center py-4 mt-8">
+        <p>© 2025 Mohi-ud-Din Islamic University. All rights reserved.</p>
+      </footer>
+    </div>
+  );
+}
+
+
+
+
+
+
+
+
+
+
+
+
+v
+const courses = [
+  { code: "MTS-111", name: "Calculus & Analytical Geometry", semester: "Spring 2022", year: 1, status: "Pass", credit: "3" },
+  { code: "CS-111", name: "Introduction to Computers", semester: "Spring 2022", year: 1, status: "Pass", credit: "3" },
+  { code: "HUM-114", name: "Islamic Studies/Ethics", semester: "Spring 2022", year: 1, status: "Pass", credit: "3" },
+  { code: "CS-113", name: "Programming Fundamentals", semester: "Spring 2022", year: 1, status: "Pass", credit: "3" },
+  { code: "ELL101", name: "Reading & Writing Skill", semester: "Spring 2022", year: 1, status: "Pass", credit: "3" },
+  { code: "CS-116", name: "Basic Electronics", semester: "Fall 2022", year: 2, status: "Pass", credit: "3" },
+  { code: "ELL 104", name: "Composition Writing", semester: "Fall 2022", year: 2, status: "Pass", credit: "3" },
+  { code: "CS-114", name: "Discrete Structures", semester: "Fall 2022", year: 2, status: "Pass", credit: "3" },
+  { code: "CS-112", name: "Object Oriented Programming", semester: "Fall 2022", year: 2, status: "Pass", credit: "3" },
+  { code: "HUM-120", name: "Pakistan Studies", semester: "Fall 2022", year: 2, status: "Pass", credit: "3" },
+  { code: "MTS-112", name: "Probability and Statistics", semester: "Fall 2022", year: 2, status: "Pass", credit: "3" },
+  { code: "CS-213", name: "Data Communication and Computer Networks", semester: "Spring 2023", year: 3, status: "Pass", credit: "3" },
+  { code: "CS-211", name: "Data Structure & Algorithms", semester: "Spring 2023", year: 3, status: "Pass", credit: "3" },
+  { code: "CS-215", name: "Digital Logic & Design", semester: "Spring 2023", year: 3, status: "Pass", credit: "3" },
+  { code: "SE-211", name: "Software Engineering", semester: "Spring 2023", year: 3, status: "Pass", credit: "3" },
+  { code: "EDU-0201", name: "Urdu Language", semester: "Spring 2023", year: 3, status: "Pass", credit: "3" },
+  { code: "EDU-0202", name: "Applied Physics", semester: "Spring 2023", year: 3, status: "Pass", credit: "3" },
+  { code: "CS-226", name: "Computer Architecture & Organization", semester: "Fall 2023", year: 4, status: "Pass", credit: "3" },
+  { code: "MTS-222", name: "Linear Algebra", semester: "Fall 2023", year: 4, status: "Pass", credit: "3" },
+  { code: "MTS-224", name: "Multivariable Calculus", semester: "Fall 2023", year: 4, status: "Pass", credit: "3" },
+  { code: "CS-222", name: "Operating System", semester: "Fall 2023", year: 4, status: "Pass", credit: "3" },
+  { code: "MGT-290", name: "Psychology", semester: "Fall 2023", year: 4, status: "Pass", credit: "3" },
+  { code: "CS-311", name: "Theory of Automata", semester: "Fall 2023", year: 4, status: "Pass", credit: "3" },
+  { code: "MTS-311", name: "Differential Equations", semester: "Spring 2024", year: 5, status: "Pass", credit: "3" },
+  { code: "CS-214", name: "Database System", semester: "Spring 2024", year: 5, status: "Pass", credit: "3" },
+  { code: "CS-0485", name: "IT Project Management", semester: "Spring 2024", year: 5, status: "Pass", credit: "3" },
+  { code: "CS-313", name: "Web Design and Development", semester: "Spring 2024", year: 5, status: "Pass", credit: "3" },
+  { code: "CS-315", name: "Microprocessor & Assembly Language", semester: "Spring 2024", year: 5, status: "Pass", credit: "3" },
+  { code: "MGT-211", name: "Principles of Management", semester: "Spring 2024", year: 5, status: "Pass", credit: "3" },
+  { code: "CS-424", name: "Artificial Intelligence", semester: "Fall 2024", year: 6, status: "Pass", credit: "3" },
+  { code: "CS-326", name: "Compiler Construction", semester: "Fall 2024", year: 6, status: "Pass", credit: "3" },
+  { code: "CS-413", name: "Design and Analysis of Algorithms", semester: "Fall 2024", year: 6, status: "Pass", credit: "3" },
+  { code: "CS-417", name: "Information Security", semester: "Fall 2024", year: 6, status: "Pass", credit: "3" },
+  { code: "CS-485", name: "Introduction to Neural Networks", semester: "Fall 2024", year: 6, status: "Pass", credit: "3" },
+  { code: "CS-317", name: "Visual Programming", semester: "Fall 2024", year: 6, status: "Pass", credit: "3" },
+  { code: "CS-452", name: "Data Encryption and Security", semester: "Spring 2025", year: 7, status: "Pass", credit: "3" },
+  { code: "CS-332", name: "Human Computer Interaction", semester: "Spring 2025", year: 7, status: "Pass", credit: "3" },
+  { code: "CS-415", name: "Numerical Computing", semester: "Spring 2025", year: 7, status: "Pass", credit: "3" },
+  { code: "CS-422", name: "Professional Practices", semester: "Spring 2025", year: 7, status: "Pass", credit: "3" },
+  { code: "CS-473", name: "Machine Learning Techniques", semester: "Spring 2025", year: 7, status: "Pass", credit: "3" },
+  { code: "ISL-601", name: "Quran o Hadith", semester: "Spring 2025", year: 7, status: "Pass", credit: "3" },
+  { code: "CS-463", name: "Data Mining", semester: "Fall 2025", year: 8, status: "Enrolled", credit: "3", attendance: "2/3" },
+  { code: "CS-499", name: "Project", semester: "Fall 2025", year: 8, status: "Enrolled", credit: "3" },
+  { code: "ISL-512", name: "Seerat and Tasawwuf", semester: "Fall 2025", year: 8, status: "Enrolled", credit: "3", attendance: "2/3" }
+];
